@@ -1,0 +1,44 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Запускать процесс при пуше в основную ветку
+  pull_request:
+    branches:
+      - main  # Запускать процесс для pull-request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests (если есть)
+        run: |
+          # Если у вас есть тесты, то выполните команду для их запуска
+          # Пример: python -m unittest
+          echo "No tests available"
+
+      - name: Build Docker image
+        run: |
+          docker build -t myapp .
+          
+      - name: Push Docker image to Docker Hub (если нужно)
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker tag myapp aleksei2203/myapp:latest
+          docker push aleksei2203/myapp:latest
+
